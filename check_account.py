@@ -32,12 +32,12 @@ def main():
     config = configparser.ConfigParser()
     config.read('config/config.ini')
     
-    # API 키 가져오기
-    access_key = config['API']['access_key']
-    secret_key = config['API']['secret_key']
+    # 환경 변수에서 API 키 확인
+    access_key = os.environ.get('UPBIT_ACCESS_KEY') or config['API']['access_key']
+    secret_key = os.environ.get('UPBIT_SECRET_KEY') or config['API']['secret_key']
     
     if access_key == 'YOUR_UPBIT_ACCESS_KEY_HERE' or secret_key == 'YOUR_UPBIT_SECRET_KEY_HERE':
-        logger.error("config.ini 파일에 Upbit API 키를 설정해야 합니다!")
+        logger.error("Upbit API 키가 설정되어 있지 않습니다. 환경 변수 또는 config.ini 파일에 설정해야 합니다!")
         sys.exit(1)
     
     # API 객체 생성
