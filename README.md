@@ -1,165 +1,88 @@
-# 비트코인 자동매매 프로그램
+# Bitcoin Automated Trading Bot
 
-업비트 API를 활용한 비트코인 자동매매 프로그램입니다.
+This project implements an automated Bitcoin trading system that integrates with the Upbit cryptocurrency exchange, featuring advanced trading strategies, backtesting capabilities, and a web-based dashboard.
 
-## 기능
+## Features
 
-- 업비트 API를 통한 시장 데이터 수집
-- 다양한 기술적 지표 분석 (이동평균선, RSI, MACD, 볼린저 밴드 등)
-- 여러 매매 전략 지원
-  - 이동평균선 교차 (Golden/Death Cross)
-  - RSI (상대강도지수) 
-  - MACD (이동평균수렴확산지수)
-  - 볼린저 밴드
-  - 변동성 돌파 전략 (K값 조정 가능)
-  - 퍼센트 기반 매매 전략 (평균 매수가 대비 수익률/손실률 기반)
-  - 복합 전략 (여러 전략의 투표 방식)
-- 최적의 코인 및 K값 자동 찾기
-- 백테스팅 기능으로 전략 성능 분석
-- 실시간 매매 신호 생성 및 자동 매매 실행
-- 슬랙을 통한 거래 알림 기능
-- 로깅 시스템을 통한 거래 기록 관리
-- Docker 컨테이너로 서버 환경에서 쉽게 실행 가능
+- **Upbit API Integration**: Secure communication with Upbit exchange for real-time market data and order execution
+- **Multiple Trading Strategies**:
+  - Moving Average (MA) crossover strategy
+  - RSI-based trading
+  - MACD-based signals
+  - Volatility Breakout strategy (with K-value optimization)
+  - Percentage-based trading
+  - Combined strategy with indicator voting
+- **Backtesting Framework**: Test strategies against historical data to evaluate performance
+- **Web Dashboard**: Real-time monitoring of portfolio, trades, and signals using Streamlit
+- **Docker Support**: Easy deployment with containerization
+- **Configurable Trading Parameters**: Adjustable settings for risk management and strategy optimization
 
-## 설치 방법
+## Getting Started
 
-### 일반 설치
-1. 저장소 클론
+### Prerequisites
+
+- Python 3.8+
+- Upbit API credentials (access key and secret key)
+- Docker (optional, for containerized deployment)
+
+### Installation
+
+1. Clone this repository:
+```bash
+git clone https://github.com/asula1/jocoding-trading.git
+cd jocoding-trading
 ```
-git clone https://github.com/yourusername/bitcoin-trading-bot.git
-cd bitcoin-trading-bot
-```
 
-2. 가상환경 생성 및 필요한 패키지 설치
-```
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+2. Install dependencies:
+```bash
 pip install -r requirements.txt
 ```
 
-3. 환경 설정
-- `config/config.ini` 파일에 업비트 API 키 및 알림 설정을 입력하세요.
-```
-[API]
-access_key = YOUR_UPBIT_ACCESS_KEY_HERE
-secret_key = YOUR_UPBIT_SECRET_KEY_HERE
+3. Configure your API credentials:
+   - Copy `config/config.ini` and fill in your Upbit API credentials
+   - Adjust trading parameters as needed
 
-[NOTIFICATION]
-slack_webhook_url = YOUR_SLACK_WEBHOOK_URL (선택사항)
-```
+### Usage
 
-### Docker를 이용한 설치
-1. 저장소 클론
-```
-git clone https://github.com/yourusername/bitcoin-trading-bot.git
-cd bitcoin-trading-bot
-```
+#### Running the Trading Bot
 
-2. 환경 설정
-- `config/config.ini` 파일에 업비트 API 키 및 알림 설정을 입력하세요.
-
-3. Docker 컨테이너 빌드 및 실행
-```
-chmod +x run_docker.sh
-./run_docker.sh
-```
-
-## 사용 방법
-
-### 기본 실행
-
-```
+```bash
 ./run.sh
 ```
 
-### 옵션 사용
+#### Running the Dashboard
 
-- 설정 파일 경로 지정
-```
-python main.py --config path/to/config.ini
-```
-
-- 거래 마켓 지정
-```
-python main.py --market KRW-BTC
+```bash
+./run_dashboard.sh
 ```
 
-- 거래 간격 지정 (초 단위)
-```
-python main.py --interval 300
-```
+#### Running Backtests
 
-- 거래 전략 지정
-```
-python main.py --strategy volatility
-```
-
-- 변동성 돌파 전략의 K값 지정
-```
-python main.py --strategy volatility --k 0.5
-```
-
-- 슬랙 알림 URL 지정
-```
-python main.py --slack "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
-```
-
-- 최적의 코인 및 K값 찾기
-```
-python main.py --find-best
-```
-
-- 백테스트 모드 실행 
-```
-python main.py --backtest
-```
-
-또는 백테스트 스크립트 직접 실행:
-```
+```bash
 ./run_backtest.sh
 ```
 
-### Docker 환경에서 실행
+#### Using Docker
 
-- Docker로 실행:
-```
+```bash
 ./run_docker.sh
 ```
 
-- Docker 중지:
-```
-./stop_docker.sh
-```
+## Structure
 
-- Docker 로그 확인:
-```
-docker-compose logs -f
-```
+- `src/upbit_api.py`: Handles Upbit API communication
+- `src/data_analyzer.py`: Processes market data and calculates indicators
+- `src/trading_strategies.py`: Implements various trading strategies
+- `src/trading_bot.py`: Core trading logic and execution
+- `src/dashboard.py`: Web-based monitoring interface
+- `main.py`: Application entry point
+- `backtest.py`: Strategy backtesting framework
 
-## 대시보드 접속
+## License
 
-자동매매 프로그램을 실행하면 브라우저에서 대시보드에 접속할 수 있습니다:
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-- 일반 실행 시: http://localhost:8501
-- Docker 실행 시: http://localhost:80 또는 http://서버IP:80
+## Acknowledgments
 
-## 지원하는 전략
-
-- `ma`: 이동평균선 교차 전략
-- `rsi`: RSI(Relative Strength Index) 전략
-- `macd`: MACD(Moving Average Convergence Divergence) 전략
-- `bb`: 볼린저 밴드 전략
-- `volatility`: 변동성 돌파 전략
-- `percentage`: 퍼센트 기반 매매 전략
-- `combined`: 복합 전략 (여러 전략의 투표 방식)
-
-## 주의 사항
-
-- 이 프로그램은 투자 조언을 제공하지 않습니다.
-- 실제 자금으로 거래할 때는 주의하세요.
-- API 키는 안전하게 보관하세요.
-- 프로그램의 성능을 보장하지 않으며, 모든 거래는 사용자의 책임입니다.
-
-## 라이선스
-
-[MIT License](LICENSE)
+- Based on the book "Cryptocurrency Trading" resources
+- Inspired by various trading strategy implementations from the cryptocurrency community
