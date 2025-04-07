@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  trading-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bitcoin-trading-bot
+    restart: unless-stopped
+    ports:
+      - "80:80"  # 호스트의 80 포트를 컨테이너의 80 포트로 매핑
+    volumes:
+      - ./logs:/app/logs  # 로그 디렉토리 마운트
+      - ./config:/app/config  # 설정 파일 마운트
+    environment:
+      - TZ=Asia/Seoul  # 타임존 설정
+    networks:
+      - trading-network
+
+networks:
+  trading-network:
+    driver: bridge
