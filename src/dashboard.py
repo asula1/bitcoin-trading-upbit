@@ -169,9 +169,10 @@ def main():
     st.set_page_config(page_title="Bitcoin Trading Bot Dashboard", layout="wide")
     
     # Docker 내에서 실행될 때 서버 주소 설정
+    # 최신 Streamlit 버전에서는 직접 서버 주소 설정이 불가능하므로 제거
+    # 대신 Docker 환경에서 실행 여부만 확인
     if os.path.exists("/.dockerenv"):
-        st.server.address = "0.0.0.0"
-        st.server.port = 80
+        st.write("Docker 환경에서 실행 중입니다.")
     
     # 사이드바
     st.sidebar.title("Bitcoin Trading Bot")

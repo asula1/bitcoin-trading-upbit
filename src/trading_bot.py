@@ -93,13 +93,24 @@ class TradingBot:
         
         position = {'has_position': False, 'volume': 0, 'avg_buy_price': 0}
         
-        for account in accounts:
-            if account['currency'] == self.market.split('-')[1]:
-                if float(account['balance']) > 0:
-                    position['has_position'] = True
-                    position['volume'] = float(account['balance'])
-                    position['avg_buy_price'] = float(account['avg_buy_price'])
-                break
+        # 확인용 로그 추가
+        self.logger.info(f"계정 정보: {accounts}")
+        
+        if not accounts or isinstance(accounts, str):
+            self.logger.warning(f"계정 정보를 가져올 수 없습니다: {accounts}")
+            return position
+            
+        try:
+            for account in accounts:
+                if isinstance(account, dict) and 'currency' in account:
+                    if account['currency'] == self.market.split('-')[1]:
+                        if float(account['balance']) > 0:
+                            position['has_position'] = True
+                            position['volume'] = float(account['balance'])
+                            position['avg_buy_price'] = float(account['avg_buy_price'])
+                        break
+        except Exception as e:
+            self.logger.error(f"포지션 확인 중 오류 발생: {e}")
         
         return position
     
@@ -176,10 +187,26 @@ class TradingBot:
         if signal == 'buy' and not self.position['has_position']:
             # 보유 현금 조회
             krw_account = None
-            for account in self.api.get_accounts():
-                if account['currency'] == 'KRW':
-                    krw_account = account
-                    break
+            accounts = self.api.get_accounts()
+            
+            # 계정 정보 유효성 확인
+            if not accounts or isinstance(accounts, str):
+                error_msg = f"계정 정보를 가져올 수 없습니다: {accounts}"
+                self.logger.error(error_msg)
+                self.send_notification(f"⚠️ {error_msg}")
+                return
+            
+            try:
+                for account in accounts:
+                    if isinstance(account, dict) and 'currency' in account:
+                        if account['currency'] == 'KRW':
+                            krw_account = account
+                            break
+            except Exception as e:
+                error_msg = f"계정 정보 확인 중 오류 발생: {e}"
+                self.logger.error(error_msg)
+                self.send_notification(f"⚠️ {error_msg}")
+                return
             
             if not krw_account:
                 error_msg = "KRW 계좌를 찾을 수 없습니다."

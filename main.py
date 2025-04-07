@@ -105,13 +105,15 @@ def main():
         # 설정 파일 로드
         config = load_config(args.config)
         
-        # API 키 확인
-        access_key = config['API']['access_key']
-        secret_key = config['API']['secret_key']
+        # API 키 확인 (환경 변수 우선, 그 다음 config.ini)
+        access_key = os.environ.get('UPBIT_ACCESS_KEY') or config['API']['access_key']
+        secret_key = os.environ.get('UPBIT_SECRET_KEY') or config['API']['secret_key']
         
         if access_key == 'YOUR_UPBIT_ACCESS_KEY_HERE' or secret_key == 'YOUR_UPBIT_SECRET_KEY_HERE':
-            logger.error("config.ini 파일에 Upbit API 키를 설정해야 합니다!")
+            logger.error("Upbit API 키가 설정되어 있지 않습니다. 환경 변수 또는 config.ini 파일에 설정해야 합니다!")
             sys.exit(1)
+            
+        logger.info("API 키 설정이 확인되었습니다.")
         
         # 슬랙 웹훅 URL
         slack_webhook_url = args.slack or config.get('NOTIFICATION', 'slack_webhook_url', fallback=None)
@@ -157,14 +159,27 @@ def main():
         import threading
         
         def run_dashboard():
-            dashboard_process = subprocess.Popen(["streamlit", "run", "dashboard.py"], 
-                                              stdout=subprocess.PIPE,
-                                              stderr=subprocess.PIPE)
-            logger.info("GUI 대시보드가 시작되었습니다.")
-            # 5초 후 브라우저 열기
-            time.sleep(5)
-            import webbrowser
-            webbrowser.open('http://localhost:8501')
+            # Docker 환경에서 실행 여부 확인
+            if os.path.exists("/.dockerenv"):
+                # Docker 환경에서는 호스트 0.0.0.0과 포트 80으로 실행
+                dashboard_process = subprocess.Popen(
+                    ["streamlit", "run", "dashboard.py", "--server.address=0.0.0.0", "--server.port=80"],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE
+                )
+                logger.info("GUI 대시보드가 시작되었습니다. (Docker 환경)")
+            else:
+                # 일반 환경에서는 기본 설정으로 실행
+                dashboard_process = subprocess.Popen(
+                    ["streamlit", "run", "dashboard.py"],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE
+                )
+                logger.info("GUI 대시보드가 시작되었습니다.")
+                # 5초 후 브라우저 열기 (일반 환경에서만)
+                time.sleep(5)
+                import webbrowser
+                webbrowser.open('http://localhost:8501')
         
         # 대시보드 스레드 시작
         dashboard_thread = threading.Thread(target=run_dashboard)

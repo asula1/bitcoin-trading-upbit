@@ -12,6 +12,8 @@ services:
     volumes:
       - ./logs:/app/logs  # 로그 디렉토리 마운트
       - ./config:/app/config  # 설정 파일 마운트
+    env_file:
+      - .env
     environment:
       - TZ=Asia/Seoul  # 타임존 설정
     networks:

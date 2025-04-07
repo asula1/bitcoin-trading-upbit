@@ -38,9 +38,18 @@ cd jocoding-trading
 pip install -r requirements.txt
 ```
 
-3. Configure your API credentials:
-   - Copy `config/config.ini` and fill in your Upbit API credentials
-   - Adjust trading parameters as needed
+3. Configure your API credentials (for security):
+   - Create a `.env` file in the root directory with your Upbit API keys:
+   ```
+   UPBIT_ACCESS_KEY=your_access_key_here
+   UPBIT_SECRET_KEY=your_secret_key_here
+   ```
+   - Alternatively, set environment variables directly:
+   ```bash
+   export UPBIT_ACCESS_KEY=your_access_key_here
+   export UPBIT_SECRET_KEY=your_secret_key_here
+   ```
+   - Adjust trading parameters in `config/config.ini` as needed
 
 ### Usage
 
@@ -65,7 +74,13 @@ pip install -r requirements.txt
 #### Using Docker
 
 ```bash
+# First create a .env file with your API keys
 ./run_docker.sh
+```
+
+Alternatively, you can use docker-compose directly:
+```bash
+docker-compose up -d
 ```
 
 ## Structure
@@ -81,6 +96,13 @@ pip install -r requirements.txt
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Security Notes
+
+- **IMPORTANT**: Never commit your API keys to the repository
+- Store sensitive information in the `.env` file or use environment variables
+- The `.env` file is excluded from git via `.gitignore`
+- Regularly rotate your API keys for enhanced security
 
 ## Acknowledgments
 

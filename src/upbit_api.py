@@ -32,6 +32,11 @@ class UpbitAPI:
             }
         
         jwt_token = jwt.encode(payload, self.secret_key)
+        
+        # PyJWT 버전에 따른 반환 타입 처리
+        if isinstance(jwt_token, bytes):
+            jwt_token = jwt_token.decode('utf-8')
+            
         authorization = f"Bearer {jwt_token}"
         
         return {"Authorization": authorization}
@@ -40,8 +45,16 @@ class UpbitAPI:
         """계좌 조회"""
         url = f"{self.base_url}/accounts"
         headers = self._get_headers()
-        response = requests.get(url, headers=headers)
-        return response.json()
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()  # 응답 상태 코드 확인
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            print(f"API 요청 중 오류 발생: {e}")
+            return []  # 오류 발생 시 빈 리스트 반환
+        except ValueError as e:
+            print(f"JSON 파싱 중 오류 발생: {e}, 응답: {response.text}")
+            return []  # JSON 파싱 실패 시 빈 리스트 반환
     
     def get_ticker(self, markets):
         """현재가 조회"""
